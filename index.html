@@ -307,6 +307,10 @@ checkBalancesBtn.addEventListener('click', async () => {
     const res = await fetch(`${getBackendBase()}/api/account/balances`);
     const data = await res.json();
     refs.jsonOutput.textContent = JSON.stringify(data, null, 2);
+
+    if (!res.ok) {
+      alert(`Bitget 餘額錯誤：${data.message || 'unknown error'}`);
+    }
   } catch (err) {
     alert(`Bitget 餘額請求失敗：${err}`);
   }
