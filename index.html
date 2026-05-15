@@ -3,375 +3,352 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>TradePlan AI</title>
+  <title>TradePlan AI Advanced</title>
   <style>
     :root {
-      --bg:#0b1020;
-      --panel:#11172a;
-      --text:#edf2ff;
-      --muted:#a6b2d9;
-      --faint:#6f7b9f;
-      --primary:#3dd9b3;
-      --border:rgba(184,198,255,.14);
-      --error:#ff6b7a;
-      --r:18px;
+      --bg:#0b1020; --panel:#11172a; --text:#edf2ff; --muted:#a6b2d9; --faint:#6f7b9f;
+      --primary:#3dd9b3; --border:rgba(184,198,255,.14); --warn:#ffb84d; --danger:#ff6b7a; --r:18px;
     }
     * { box-sizing:border-box; }
-    body {
-      margin:0;
-      font-family: Arial, Helvetica, sans-serif;
-      background:linear-gradient(180deg,#090d19 0%,#0b1020 100%);
-      color:var(--text);
-    }
-    .wrap {
-      width:min(calc(100% - 24px),1180px);
-      margin:0 auto;
-      padding:24px 0 56px;
-    }
-    .grid {
-      display:grid;
-      grid-template-columns:420px 1fr;
-      gap:24px;
-    }
-    .card {
-      background:rgba(255,255,255,.03);
-      border:1px solid var(--border);
-      border-radius:var(--r);
-      padding:24px;
-    }
-    .field {
-      display:grid;
-      gap:8px;
-      margin-bottom:16px;
-    }
-    label {
-      font-size:14px;
-      font-weight:600;
-    }
-    input,select,textarea,button {
-      font:inherit;
-    }
-    input,select,textarea {
-      width:100%;
-      background:#08101e;
-      color:var(--text);
-      border:1px solid var(--border);
-      border-radius:12px;
-      padding:14px;
-    }
-    textarea {
-      min-height:170px;
-      resize:vertical;
-    }
-    .two {
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:16px;
-    }
-    .btns {
-      display:flex;
-      flex-wrap:wrap;
-      gap:12px;
-    }
-    button {
-      border:0;
-      border-radius:12px;
-      padding:14px 16px;
-      cursor:pointer;
-    }
-    .primary {
-      background:linear-gradient(180deg,var(--primary),#2bc5a0);
-      color:#03110e;
-      font-weight:800;
-    }
-    .ghost {
-      background:rgba(255,255,255,.04);
-      color:var(--text);
-      border:1px solid var(--border);
-    }
-    .banner {
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      gap:12px;
-      padding:18px;
-      border-radius:16px;
-      background:rgba(61,217,179,.08);
-      border:1px solid rgba(61,217,179,.2);
-    }
-    .banner.no-trade {
-      background:rgba(255,107,122,.08);
-      border-color:rgba(255,107,122,.2);
-    }
-    .metrics,.targets {
-      display:grid;
-      grid-template-columns:repeat(3,1fr);
-      gap:16px;
-      margin-top:16px;
-    }
-    .targets {
-      grid-template-columns:repeat(2,1fr);
-    }
-    .mini {
-      padding:16px;
-      border-radius:14px;
-      background:rgba(255,255,255,.025);
-      border:1px solid var(--border);
-    }
-    .mini span {
-      display:block;
-      color:var(--faint);
-      font-size:12px;
-      margin-bottom:8px;
-      text-transform:uppercase;
-    }
-    pre {
-      background:#08101e;
-      border:1px solid var(--border);
-      border-radius:16px;
-      padding:18px;
-      overflow:auto;
-      color:#c9f8ea;
-    }
-    ul {
-      padding-left:18px;
-      color:var(--muted);
-    }
-    h1,h2 {
-      margin-top:0;
-    }
-    .title {
-      margin-bottom:18px;
-    }
-    .hint {
-      color:var(--muted);
-      font-size:14px;
-      margin-bottom:18px;
-    }
-    @media (max-width:980px) {
-      .grid { grid-template-columns:1fr; }
-    }
-    @media (max-width:680px) {
-      .two,.metrics,.targets { grid-template-columns:1fr; }
-    }
+    body { margin:0; font-family: Arial, Helvetica, sans-serif; background:linear-gradient(180deg,#090d19 0%,#0b1020 100%); color:var(--text); }
+    .wrap { width:min(calc(100% - 24px),1280px); margin:0 auto; padding:24px 0 56px; }
+    .top { margin-bottom:18px; }
+    .top p { color:var(--muted); margin:8px 0 0; }
+    .grid { display:grid; grid-template-columns:440px 1fr; gap:24px; }
+    .card { background:rgba(255,255,255,.03); border:1px solid var(--border); border-radius:var(--r); padding:24px; }
+    .field { display:grid; gap:8px; margin-bottom:14px; }
+    .two { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+    .three { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; }
+    input, select, textarea, button { font:inherit; }
+    input, select, textarea { width:100%; background:#08101e; color:var(--text); border:1px solid var(--border); border-radius:12px; padding:12px 14px; }
+    textarea { min-height:150px; resize:vertical; }
+    details { border:1px solid var(--border); border-radius:14px; padding:14px; margin-top:14px; background:rgba(255,255,255,.02); }
+    summary { cursor:pointer; font-weight:700; }
+    .btns { display:flex; flex-wrap:wrap; gap:12px; margin-top:16px; }
+    button { border:0; border-radius:12px; padding:14px 16px; cursor:pointer; }
+    .primary { background:linear-gradient(180deg,var(--primary),#2bc5a0); color:#03110e; font-weight:800; }
+    .ghost { background:rgba(255,255,255,.04); color:var(--text); border:1px solid var(--border); }
+    .result-head { display:flex; justify-content:space-between; gap:12px; align-items:center; padding:18px; border-radius:16px; border:1px solid rgba(61,217,179,.2); background:rgba(61,217,179,.08); }
+    .result-head.no-trade { border-color:rgba(255,107,122,.2); background:rgba(255,107,122,.08); }
+    .metrics, .targets, .scores { display:grid; gap:14px; margin-top:16px; }
+    .metrics { grid-template-columns:repeat(3,1fr); }
+    .targets { grid-template-columns:repeat(3,1fr); }
+    .scores { grid-template-columns:repeat(2,1fr); }
+    .mini { padding:16px; border-radius:14px; background:rgba(255,255,255,.025); border:1px solid var(--border); }
+    .mini span { display:block; font-size:12px; text-transform:uppercase; color:var(--faint); margin-bottom:8px; }
+    .warnings { color:#ffd699; }
+    .danger { color:#ffb3bb; }
+    pre { background:#08101e; border:1px solid var(--border); border-radius:16px; padding:18px; overflow:auto; color:#c9f8ea; }
+    ul { padding-left:18px; color:var(--muted); }
+    h2, h3 { margin-top:0; }
+    @media (max-width:1024px){ .grid { grid-template-columns:1fr; } }
+    @media (max-width:720px){ .two,.three,.metrics,.targets,.scores { grid-template-columns:1fr; } }
   </style>
 </head>
 <body>
   <div class="wrap">
-    <div class="title">
-      <h1>TradePlan AI</h1>
-      <div class="hint">GitHub Pages 前端 + 本機 / 雲端後端 API</div>
+    <div class="top">
+      <h1>TradePlan AI Advanced</h1>
+      <p>多指標分析 → 交易計畫 → 下單預覽。</p>
     </div>
 
     <div class="grid">
       <section class="card">
-        <h2>分析輸入</h2>
+        <h2>輸入資料</h2>
 
         <div class="field">
           <label for="backendUrl">Backend URL</label>
           <input id="backendUrl" value="http://localhost:8000" />
         </div>
 
-        <form id="tradeForm">
+        <form id="advancedForm">
           <div class="two">
-            <div class="field">
-              <label for="symbol">商品</label>
-              <input id="symbol" value="BTCUSDT" />
-            </div>
-            <div class="field">
-              <label for="timeframe">時間框架</label>
-              <select id="timeframe">
-                <option>5m</option>
-                <option selected>15m</option>
-                <option>1h</option>
-                <option>4h</option>
-                <option>1D</option>
-              </select>
-            </div>
+            <div class="field"><label for="symbol">商品</label><input id="symbol" value="BTCUSDT" /></div>
+            <div class="field"><label for="timeframe">時間框架</label><select id="timeframe"><option>5m</option><option selected>15m</option><option>1h</option><option>4h</option><option>1D</option></select></div>
           </div>
 
-          <div class="field">
-            <label for="marketData">價格資料 / 技術指標</label>
-            <textarea id="marketData">open: 102100
-high: 102800
-low: 101950
-close: 102450
-ema20: 102300
-ema50: 102050
-rsi: 58
-support: 102000
-resistance: 103200</textarea>
+          <h3>核心市場資料</h3>
+          <div class="three">
+            <div class="field"><label for="open">Open</label><input id="open" type="number" value="102100" /></div>
+            <div class="field"><label for="high">High</label><input id="high" type="number" value="102800" /></div>
+            <div class="field"><label for="low">Low</label><input id="low" type="number" value="101950" /></div>
+            <div class="field"><label for="close">Close</label><input id="close" type="number" value="102450" /></div>
+            <div class="field"><label for="support">Support</label><input id="support" type="number" value="102000" /></div>
+            <div class="field"><label for="resistance">Resistance</label><input id="resistance" type="number" value="103200" /></div>
           </div>
 
-          <div class="two">
-            <div class="field">
-              <label for="riskPercent">單筆風險 %</label>
-              <input id="riskPercent" type="number" value="1" step="0.1" />
-            </div>
-            <div class="field">
-              <label for="minRR">最低風報比</label>
-              <input id="minRR" type="number" value="2" step="0.1" />
-            </div>
+          <h3>基本指標</h3>
+          <div class="three">
+            <div class="field"><label for="ema20">EMA20</label><input id="ema20" type="number" value="102300" /></div>
+            <div class="field"><label for="ema50">EMA50</label><input id="ema50" type="number" value="102050" /></div>
+            <div class="field"><label for="rsi">RSI</label><input id="rsi" type="number" value="58" /></div>
           </div>
 
-        <div class="btns">
-  <button class="primary" type="submit">送到後端分析</button>
-  <button class="ghost" type="button" id="checkHealth">檢查後端</button>
-  <button class="ghost" type="button" id="checkBalances">查 Bitget 餘額</button>
-</div>
+          <details>
+            <summary>進階指標</summary>
+            <div class="three" style="margin-top:14px;">
+              <div class="field"><label for="macdHist">MACD Hist</label><input id="macdHist" type="number" value="12" /></div>
+              <div class="field"><label for="atr">ATR</label><input id="atr" type="number" value="180" /></div>
+              <div class="field"><label for="vwap">VWAP</label><input id="vwap" type="number" value="102180" /></div>
+              <div class="field"><label for="mfi">MFI</label><input id="mfi" type="number" value="61" /></div>
+              <div class="field"><label for="stochasticK">Stochastic K</label><input id="stochasticK" type="number" value="72" /></div>
+              <div class="field"><label for="stochasticD">Stochastic D</label><input id="stochasticD" type="number" value="66" /></div>
+              <div class="field"><label for="bbUpper">BB Upper</label><input id="bbUpper" type="number" value="103050" /></div>
+              <div class="field"><label for="bbMiddle">BB Middle</label><input id="bbMiddle" type="number" value="102300" /></div>
+              <div class="field"><label for="bbLower">BB Lower</label><input id="bbLower" type="number" value="101700" /></div>
+              <div class="field"><label for="bbWidth">BB Width</label><input id="bbWidth" type="number" step="0.001" value="0.018" /></div>
+              <div class="field"><label for="obvSlope">OBV Slope</label><select id="obvSlope"><option selected>up</option><option>down</option><option>flat</option></select></div>
+            </div>
+          </details>
+
+          <details>
+            <summary>市場結構 / SMC</summary>
+            <div class="three" style="margin-top:14px;">
+              <div class="field"><label for="bos">BOS</label><select id="bos"><option selected>bullish</option><option>bearish</option><option>none</option></select></div>
+              <div class="field"><label for="choch">CHoCH</label><select id="choch"><option>none</option><option selected>bullish</option><option>bearish</option></select></div>
+              <div class="field"><label for="orderBlock">Order Block</label><select id="orderBlock"><option selected>bullish</option><option>bearish</option><option>none</option></select></div>
+              <div class="field"><label for="fvg">FVG</label><select id="fvg"><option selected>below_price</option><option>above_price</option><option>none</option></select></div>
+              <div class="field"><label for="mss">MSS</label><select id="mss"><option selected>bullish</option><option>bearish</option><option>none</option></select></div>
+            </div>
+          </details>
+
+          <details>
+            <summary>價位與風控</summary>
+            <div class="three" style="margin-top:14px;">
+              <div class="field"><label for="fib618">Fib 0.618</label><input id="fib618" type="number" value="102120" /></div>
+              <div class="field"><label for="pivot">Pivot</label><input id="pivot" type="number" value="102240" /></div>
+              <div class="field"><label for="demandLow">Demand Low</label><input id="demandLow" type="number" value="101980" /></div>
+              <div class="field"><label for="demandHigh">Demand High</label><input id="demandHigh" type="number" value="102140" /></div>
+              <div class="field"><label for="accountSize">Account Size</label><input id="accountSize" type="number" value="1000" /></div>
+              <div class="field"><label for="riskPercent">Risk %</label><input id="riskPercent" type="number" step="0.1" value="1" /></div>
+              <div class="field"><label for="minRR">Min RR</label><input id="minRR" type="number" step="0.1" value="2" /></div>
+            </div>
+          </details>
+
+          <div class="btns">
+            <button class="primary" type="submit">進階分析</button>
+            <button class="ghost" type="button" id="previewOrderBtn">下單預覽</button>
+            <button class="ghost" type="button" id="healthBtn">檢查後端</button>
+          </div>
         </form>
       </section>
 
       <section class="card">
-        <h2>結果</h2>
-
-        <div id="banner" class="banner">
+        <h2>分析結果</h2>
+        <div id="resultHead" class="result-head">
           <div>
             <div style="font-size:12px;color:#6f7b9f;text-transform:uppercase;">Bias</div>
-            <div id="bias" style="font-size:32px;font-weight:800;">Long</div>
+            <div id="bias" style="font-size:32px;font-weight:800;">LONG</div>
           </div>
-          <div id="confidence">Confidence · medium</div>
+          <div id="confidence">Confidence · 76</div>
         </div>
 
         <div class="metrics">
-          <div class="mini"><span>Entry</span><strong id="entry">102350 - 102500</strong></div>
-          <div class="mini"><span>Risk / Reward</span><strong id="rr">1:2.1</strong></div>
-          <div class="mini"><span>Invalidation</span><strong id="invalid">15m close below 101800</strong></div>
+          <div class="mini"><span>Decision</span><strong id="decision">trade</strong></div>
+          <div class="mini"><span>Market Regime</span><strong id="regime">bullish_trend</strong></div>
+          <div class="mini"><span>Engine</span><strong id="engine">tradeplan-advanced-v1</strong></div>
         </div>
 
         <div class="targets">
-          <div class="mini"><span>Stop loss</span><strong id="sl">101800</strong></div>
-          <div class="mini"><span>Take profit 1</span><strong id="tp1">103200</strong></div>
-          <div class="mini"><span>Take profit 2</span><strong id="tp2">104000</strong></div>
-          <div class="mini"><span>Engine</span><strong id="engine">waiting-for-backend</strong></div>
+          <div class="mini"><span>Entry Zone</span><strong id="entryZone">102350 - 102500</strong></div>
+          <div class="mini"><span>Stop Loss</span><strong id="stopLoss">101800</strong></div>
+          <div class="mini"><span>TP1 / TP2 / TP3</span><strong id="targetsText">103200 / 104000 / 104650</strong></div>
         </div>
 
-        <h2 style="margin-top:22px;">Reason</h2>
-        <ul id="reasonList"></ul>
+        <div class="targets">
+          <div class="mini"><span>RR</span><strong id="rrText">1:1.2 / 1:2.1 / 1:3.0</strong></div>
+          <div class="mini"><span>Risk Amount</span><strong id="riskAmount">10</strong></div>
+          <div class="mini"><span>Position Size</span><strong id="positionSize">0.016</strong></div>
+        </div>
 
-        <h2 style="margin-top:22px;">JSON</h2>
-        <pre id="jsonOutput"></pre>
+        <h3 style="margin-top:22px;">分類分數</h3>
+        <div class="scores" id="scoreCards"></div>
+
+        <h3 style="margin-top:22px;">Reasons</h3>
+        <ul id="reasons"></ul>
+
+        <h3 style="margin-top:22px;">Warnings</h3>
+        <ul id="warnings" class="warnings"></ul>
+
+        <h3 style="margin-top:22px;">No Trade If</h3>
+        <ul id="noTradeIf" class="danger"></ul>
+
+        <h3 style="margin-top:22px;">Order Preview</h3>
+        <pre id="orderPreview">尚未產生</pre>
+
+        <h3 style="margin-top:22px;">Raw JSON</h3>
+        <pre id="rawJson"></pre>
       </section>
     </div>
   </div>
 
   <script>
-    const form = document.getElementById('tradeForm');
-    const backendUrlInput = document.getElementById('backendUrl');
-    const checkHealthBtn = document.getElementById('checkHealth');
-    const checkBalancesBtn = document.getElementById('checkBalances');
+    const byId = (id) => document.getElementById(id);
+    const form = byId('advancedForm');
+    const healthBtn = byId('healthBtn');
+    const previewOrderBtn = byId('previewOrderBtn');
 
-    const refs = {
-      banner: document.getElementById('banner'),
-      bias: document.getElementById('bias'),
-      confidence: document.getElementById('confidence'),
-      entry: document.getElementById('entry'),
-      rr: document.getElementById('rr'),
-      invalid: document.getElementById('invalid'),
-      sl: document.getElementById('sl'),
-      tp1: document.getElementById('tp1'),
-      tp2: document.getElementById('tp2'),
-      engine: document.getElementById('engine'),
-      reasonList: document.getElementById('reasonList'),
-      jsonOutput: document.getElementById('jsonOutput')
-    };
+    let latestAnalysis = null;
 
-    function getBackendBase() {
-      return backendUrlInput.value.trim().replace(/\/$/, '');
+    function backendBase() {
+      return byId('backendUrl').value.trim().replace(/\/$/, '');
     }
 
-    function renderPlan(plan) {
-      const noTrade = plan.bias === 'no_trade';
-      refs.banner.classList.toggle('no-trade', noTrade);
-      refs.bias.textContent = noTrade ? 'No Trade' : String(plan.bias || '').toUpperCase();
-      refs.confidence.textContent = `Confidence · ${plan.confidence ?? 'low'}`;
-      refs.entry.textContent = plan.entry ?? '—';
-      refs.rr.textContent = plan.risk_reward ?? '—';
-      refs.invalid.textContent = plan.invalidation ?? '—';
-      refs.sl.textContent = plan.stop_loss ?? '—';
-      refs.tp1.textContent = plan.take_profit_1 ?? '—';
-      refs.tp2.textContent = plan.take_profit_2 ?? '—';
-      refs.engine.textContent = plan.meta?.engine ?? 'unknown';
+    function numberValue(id) {
+      const v = Number(byId(id).value);
+      return Number.isFinite(v) ? v : null;
+    }
 
-      refs.reasonList.innerHTML = '';
-      (plan.reason || []).forEach(item => {
+    function collectPayload() {
+      return {
+        symbol: byId('symbol').value.trim(),
+        timeframe: byId('timeframe').value,
+        marketData: {
+          open: numberValue('open'),
+          high: numberValue('high'),
+          low: numberValue('low'),
+          close: numberValue('close'),
+          support: numberValue('support'),
+          resistance: numberValue('resistance')
+        },
+        indicators: {
+          ema20: numberValue('ema20'),
+          ema50: numberValue('ema50'),
+          rsi: numberValue('rsi'),
+          macdHist: numberValue('macdHist'),
+          atr: numberValue('atr'),
+          vwap: numberValue('vwap'),
+          mfi: numberValue('mfi'),
+          stochasticK: numberValue('stochasticK'),
+          stochasticD: numberValue('stochasticD'),
+          bbUpper: numberValue('bbUpper'),
+          bbMiddle: numberValue('bbMiddle'),
+          bbLower: numberValue('bbLower'),
+          bbWidth: numberValue('bbWidth'),
+          obvSlope: byId('obvSlope').value
+        },
+        structure: {
+          bos: byId('bos').value,
+          choch: byId('choch').value,
+          orderBlock: byId('orderBlock').value,
+          fvg: byId('fvg').value,
+          mss: byId('mss').value
+        },
+        levels: {
+          fib618: numberValue('fib618'),
+          pivot: numberValue('pivot'),
+          demandLow: numberValue('demandLow'),
+          demandHigh: numberValue('demandHigh')
+        },
+        risk: {
+          accountSize: numberValue('accountSize'),
+          riskPercent: numberValue('riskPercent'),
+          minRR: numberValue('minRR')
+        }
+      };
+    }
+
+    function renderList(id, items) {
+      const el = byId(id);
+      el.innerHTML = '';
+      (items || []).forEach(item => {
         const li = document.createElement('li');
         li.textContent = item;
-        refs.reasonList.appendChild(li);
+        el.appendChild(li);
       });
-
-      refs.jsonOutput.textContent = JSON.stringify(plan, null, 2);
     }
-checkBalancesBtn.addEventListener('click', async () => {
-  try {
-    const res = await fetch(`${getBackendBase()}/api/account/balances`);
-    const data = await res.json();
-    refs.jsonOutput.textContent = JSON.stringify(data, null, 2);
 
-    if (!res.ok) {
-      alert(`Bitget 餘額錯誤：${data.message || 'unknown error'}`);
+    function renderScores(analysis = {}) {
+      const scoreCards = byId('scoreCards');
+      scoreCards.innerHTML = '';
+      Object.entries(analysis).forEach(([key, value]) => {
+        const div = document.createElement('div');
+        div.className = 'mini';
+        div.innerHTML = `<span>${key}</span><strong>${value.score}</strong><div style="color:#a6b2d9;margin-top:8px;">${value.summary}</div>`;
+        scoreCards.appendChild(div);
+      });
     }
-  } catch (err) {
-    alert(`Bitget 餘額請求失敗：${err}`);
-  }
-});
-    checkHealthBtn.addEventListener('click', async () => {
+
+    function renderAnalysis(data) {
+      latestAnalysis = data;
+      const noTrade = data.decision === 'no_trade';
+      byId('resultHead').classList.toggle('no-trade', noTrade);
+      byId('bias').textContent = String(data.bias || 'no_trade').toUpperCase();
+      byId('confidence').textContent = `Confidence · ${data.confidence ?? 0}`;
+      byId('decision').textContent = data.decision ?? 'no_trade';
+      byId('regime').textContent = data.market_regime ?? 'unknown';
+      byId('engine').textContent = data.execution?.mode ? 'tradeplan-advanced-v1' : 'unknown';
+
+      const entry = data.entry_zone ? `${data.entry_zone.low} - ${data.entry_zone.high}` : '—';
+      byId('entryZone').textContent = entry;
+      byId('stopLoss').textContent = data.stop_loss ?? '—';
+      byId('targetsText').textContent = data.take_profit ? `${data.take_profit.tp1} / ${data.take_profit.tp2} / ${data.take_profit.tp3}` : '—';
+      byId('rrText').textContent = data.risk_reward ? `1:${data.risk_reward.tp1} / 1:${data.risk_reward.tp2} / 1:${data.risk_reward.tp3}` : '—';
+      byId('riskAmount').textContent = data.position?.risk_amount ?? '—';
+      byId('positionSize').textContent = data.position?.units ?? '—';
+
+      renderScores(data.analysis || {});
+      renderList('reasons', data.reasons || []);
+      renderList('warnings', data.warnings || []);
+      renderList('noTradeIf', data.no_trade_if || []);
+      byId('rawJson').textContent = JSON.stringify(data, null, 2);
+    }
+
+    healthBtn.addEventListener('click', async () => {
       try {
-        const res = await fetch(`${getBackendBase()}/health`);
+        const res = await fetch(`${backendBase()}/health`);
         const data = await res.json();
-        alert(`後端正常：${JSON.stringify(data)}`);
+        alert(JSON.stringify(data));
       } catch (err) {
-        alert(`後端連線失敗：${err}`);
+        alert(`後端錯誤：${err}`);
       }
     });
 
-    form.addEventListener('submit', async (event) => {
-      event.preventDefault();
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      try {
+        const res = await fetch(`${backendBase()}/api/analyze-advanced`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(collectPayload())
+        });
+        const data = await res.json();
+        renderAnalysis(data);
+      } catch (err) {
+        byId('rawJson').textContent = JSON.stringify({ error: String(err) }, null, 2);
+      }
+    });
+
+    previewOrderBtn.addEventListener('click', async () => {
+      if (!latestAnalysis || !latestAnalysis.entry_zone || !latestAnalysis.stop_loss || !latestAnalysis.take_profit) {
+        alert('請先完成進階分析');
+        return;
+      }
+
+      const entryPrice = (latestAnalysis.entry_zone.low + latestAnalysis.entry_zone.high) / 2;
+      const side = latestAnalysis.bias === 'long' ? 'buy' : 'sell';
 
       const payload = {
-        symbol: document.getElementById('symbol').value.trim(),
-        timeframe: document.getElementById('timeframe').value,
-        marketData: document.getElementById('marketData').value.trim(),
-        riskPercent: document.getElementById('riskPercent').value,
-        minRR: document.getElementById('minRR').value
+        symbol: byId('symbol').value.trim(),
+        side,
+        entryPrice,
+        stopLoss: latestAnalysis.stop_loss,
+        takeProfit: latestAnalysis.take_profit.tp2,
+        accountSize: numberValue('accountSize'),
+        riskPercent: numberValue('riskPercent')
       };
 
       try {
-        const res = await fetch(`${getBackendBase()}/api/analyze`, {
+        const res = await fetch(`${backendBase()}/api/order/preview`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)
         });
-        const result = await res.json();
-        renderPlan(result);
+        const data = await res.json();
+        byId('orderPreview').textContent = JSON.stringify(data, null, 2);
       } catch (err) {
-        renderPlan({
-          bias: 'no_trade',
-          entry: null,
-          stop_loss: null,
-          take_profit_1: null,
-          take_profit_2: null,
-          risk_reward: null,
-          confidence: 'low',
-          reason: [`後端連線失敗: ${String(err)}`],
-          invalidation: 'backend unreachable',
-          disclaimer: 'For educational use only. Not financial advice.'
-        });
+        byId('orderPreview').textContent = JSON.stringify({ error: String(err) }, null, 2);
       }
-    });
-
-    renderPlan({
-      bias: 'long',
-      entry: '102350 - 102500',
-      stop_loss: '101800',
-      take_profit_1: '103200',
-      take_profit_2: '104000',
-      risk_reward: '1:2.1',
-      confidence: 'medium',
-      reason: ['這是初始畫面。按「送到後端分析」後會改成真實 API response。'],
-      invalidation: '15m close below 101800',
-      disclaimer: 'For educational use only. Not financial advice.',
-      meta: { engine: 'waiting-for-backend' }
     });
   </script>
 </body>
