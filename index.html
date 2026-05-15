@@ -214,10 +214,11 @@ resistance: 103200</textarea>
             </div>
           </div>
 
-          <div class="btns">
-            <button class="primary" type="submit">送到後端分析</button>
-            <button class="ghost" type="button" id="checkHealth">檢查後端</button>
-          </div>
+        <div class="btns">
+  <button class="primary" type="submit">送到後端分析</button>
+  <button class="ghost" type="button" id="checkHealth">檢查後端</button>
+  <button class="ghost" type="button" id="checkBalances">查 Bitget 餘額</button>
+</div>
         </form>
       </section>
 
@@ -258,6 +259,7 @@ resistance: 103200</textarea>
     const form = document.getElementById('tradeForm');
     const backendUrlInput = document.getElementById('backendUrl');
     const checkHealthBtn = document.getElementById('checkHealth');
+    const checkBalancesBtn = document.getElementById('checkBalances');
 
     const refs = {
       banner: document.getElementById('banner'),
@@ -300,7 +302,15 @@ resistance: 103200</textarea>
 
       refs.jsonOutput.textContent = JSON.stringify(plan, null, 2);
     }
-
+checkBalancesBtn.addEventListener('click', async () => {
+  try {
+    const res = await fetch(`${getBackendBase()}/api/account/balances`);
+    const data = await res.json();
+    refs.jsonOutput.textContent = JSON.stringify(data, null, 2);
+  } catch (err) {
+    alert(`Bitget 餘額請求失敗：${err}`);
+  }
+});
     checkHealthBtn.addEventListener('click', async () => {
       try {
         const res = await fetch(`${getBackendBase()}/health`);
