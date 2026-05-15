@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="zh-Hant" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TradePlan AI Connected Frontend</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root { --bg:#0b1020; --panel:#11172a; --panel2:#161d34; --text:#edf2ff; --muted:#a6b2d9; --faint:#6f7b9f; --primary:#3dd9b3; --border:rgba(184,198,255,.14); --error:#ff6b7a; --warn:#ffb84d; --ok:#6dde8f; --r:18px; }
+    * { box-sizing:border-box; }
+    body { margin:0; font-family:Inter,sans-serif; background:linear-gradient(180deg,#090d19 0%,#0b1020 100%); color:var(--text); }
+    .wrap { width:min(calc(100% - 24px),1180px); margin:0 auto; padding:24px 0 56px; }
+    .top { display:flex; justify-content:space-between; gap:16px; align-items:center; margin-bottom:24px; }
+    .brand { font-weight:800; }
+    .pill { border:1px solid var(--border); padding:10px 14px; border-radius:999px; color:var(--muted); font-size:14px; }
+    .grid { display:grid; grid-template-columns:420px 1fr; gap:24px; }
+    .card { background:rgba(255,255,255,.03); border:1px solid var(--border); border-radius:var(--r); padding:24px; }
+    h1,h2 { margin:0 0 10px; }
+    p { color:var(--muted); }
+    .field { display:grid; gap:8px; margin-bottom:16px; }
+    label { font-size:14px; font-weight:600; }
+    input,select,textarea { width:100%; background:#08101e; color:var(--text); border:1px solid var(--border); border-radius:12px; padding:14px; font:inherit; }
+    textarea { min-height:170px; resize:vertical; }
+    .two { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+    .btns { display:flex; flex-wrap:wrap; gap:12px; }
+    button { border:0; border-radius:12px; padding:14px 16px; cursor:pointer; font:inherit; }
+    .primary { background:linear-gradient(180deg,var(--primary),#2bc5a0); color:#03110e; font-weight:800; }
+    .ghost { background:rgba(255,255,255,.04); color:var(--text); border:1px solid var(--border); }
+    .banner { display:flex; justify-content:space-between; align-items:center; gap:12px; padding:18px; border-radius:16px; background:rgba(61,217,179,.08); border:1px solid rgba(61,217,179,.2); }
+    .banner.no-trade { background:rgba(255,107,122,.08); border-color:rgba(255,107,122,.2); }
+    .metrics,.targets { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-top:16px; }
+    .targets { grid-template-columns:repeat(2,1fr); }
+    .mini { padding:16px; border-radius:14px; background:rgba(255,255,255,.025); border:1px solid var(--border); }
+    .mini span { display:block; color:var(--faint); font-size:12px; margin-bottom:8px; text-transform:uppercase; }
+    pre { background:#08101e; border:1px solid var(--border); border-radius:16px; padding:18px; overflow:auto; color:#c9f8ea; }
+    ul { padding-left:18px; color:var(--muted); }
+    .help { font-size:13px; color:var(--faint); }
+    @media (max-width:980px){ .grid{grid-template-columns:1fr;} }
+    @media (max-width:680px){ .two,.metrics,.targets{grid-template-columns:1fr;} .top{flex-direction:column;align-items:flex-start;} }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="top">
+      <div>
+        <div class="brand">TradePlan AI · Node backend version</div>
+        <p>這版前端會直接呼叫你的 Node.js 後端，而不是用前端假資料。</p>
+      </div>
+      <div class="pill" id="backendStatus">Backend URL 未設定</div>
+    </div>
+
+    <div class="grid">
+      <section class="card">
+        <h2>分析輸入</h2>
+        <p>先設定你的 backend URL，再按送出。</p>
+
+        <div class="field">
+          <label for="backendUrl">Backend URL</label>
+          <input id="backendUrl" value="http://localhost:8000" />
+          <div class="help">本機測試可用 http://localhost:8000；部署後改成你的 Render / Railway / VPS 網域。</div>
+        </div>
+
+        <form id="tradeForm">
+          <div class="two">
+            <div class="field">
+              <label for="symbol">商品</label>
+              <input id="symbol" name="symbol" value="BTCUSDT" required />
+            </div>
+            <div class="field">
+              <label for="timeframe">時間框架</label>
+              <select id="timeframe" name="timeframe">
+                <option>5m</option>
+                <option selected>15m</option>
+                <option>1h</option>
+                <option>4h</option>
+                <option>1D</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="marketData">價格資料 / 技術指標</label>
+            <textarea id="marketData" name="marketData">open: 102100
+high: 102800
+low: 101950
+close: 102450
+ema20: 102300
+ema50: 102050
+rsi: 58
+support: 102000
+resistance: 103200</textarea>
+          </div>
+
+          <div class="two">
+            <div class="field">
+              <label for="riskPercent">單筆風險 %</label>
+              <input id="riskPercent" name="riskPercent" type="number" value="1" step="0.1" />
+            </div>
+            <div class="field">
+              <label for="minRR">最低風報比</label>
+              <input id="minRR" name="minRR" type="number" value="2" step="0.1" />
+            </div>
+          </div>
+
+          <div class="btns">
+            <button class="primary" type="submit">送到後端分析</button>
+            <button class="ghost" type="button" id="checkHealth">檢查後端</button>
+            <button class="ghost" type="button" id="checkBalances">測 Bitget 餘額</button>
+          </div>
+        </form>
+      </section>
+
+      <section class="card">
+        <h2>結果</h2>
+        <div id="banner" class="banner">
+          <div>
+            <div style="font-size:12px;color:var(--faint);text-transform:uppercase;">Bias</div>
+            <div id="bias" style="font-size:32px;font-weight:800;">Long</div>
+          </div>
+          <div id="confidence">Confidence · medium</div>
+        </div>
+
+        <div class="metrics">
+          <div class="mini"><span>Entry</span><strong id="entry">102350 - 102500</strong></div>
+          <div class="mini"><span>Risk / Reward</span><strong id="rr">1:2.1</strong></div>
+          <div class="mini"><span>Invalidation</span><strong id="invalid">15m close below 101800</strong></div>
+        </div>
+
+        <div class="targets">
+          <div class="mini"><span>Stop loss</span><strong id="sl">101800</strong></div>
+          <div class="mini"><span>Take profit 1</span><strong id="tp1">103200</strong></div>
+          <div class="mini"><span>Take profit 2</span><strong id="tp2">104000</strong></div>
+          <div class="mini"><span>Engine</span><strong id="engine">node-backend-engine-v1</strong></div>
+        </div>
+
+        <h2 style="margin-top:22px;">Reason</h2>
+        <ul id="reasonList"></ul>
+
+        <h2 style="margin-top:22px;">JSON</h2>
+        <pre id="jsonOutput"></pre>
+      </section>
+    </div>
+  </div>
+
+  <script>
+    const form = document.getElementById('tradeForm');
+    const backendUrlInput = document.getElementById('backendUrl');
+    const backendStatus = document.getElementById('backendStatus');
+    const checkHealthBtn = document.getElementById('checkHealth');
+    const checkBalancesBtn = document.getElementById('checkBalances');
+    const refs = {
+      banner: document.getElementById('banner'),
+      bias: document.getElementById('bias'),
+      confidence: document.getElementById('confidence'),
+      entry: document.getElementById('entry'),
+      rr: document.getElementById('rr'),
+      invalid: document.getElementById('invalid'),
+      sl: document.getElementById('sl'),
+      tp1: document.getElementById('tp1'),
+      tp2: document.getElementById('tp2'),
+      engine: document.getElementById('engine'),
+      reasonList: document.getElementById('reasonList'),
+      jsonOutput: document.getElementById('jsonOutput')
+    };
+
+    function getBackendBase() {
+      return backendUrlInput.value.trim().replace(/\/$/, '');
+    }
+
+    function updateBackendStatus() {
+      backendStatus.textContent = `Backend URL · ${getBackendBase() || '未設定'}`;
+    }
+
+    function renderPlan(plan) {
+      const noTrade = plan.bias === 'no_trade';
+      refs.banner.classList.toggle('no-trade', noTrade);
+      refs.bias.textContent = noTrade ? 'No Trade' : String(plan.bias || '').toUpperCase();
+      refs.confidence.textContent = `Confidence · ${plan.confidence ?? 'low'}`;
+      refs.entry.textContent = plan.entry ?? '—';
+      refs.rr.textContent = plan.risk_reward ?? '—';
+      refs.invalid.textContent = plan.invalidation ?? '—';
+      refs.sl.textContent = plan.stop_loss ?? '—';
+      refs.tp1.textContent = plan.take_profit_1 ?? '—';
+      refs.tp2.textContent = plan.take_profit_2 ?? '—';
+      refs.engine.textContent = plan.meta?.engine ?? 'unknown';
+      refs.reasonList.innerHTML = '';
+      (plan.reason || []).forEach(item => {
+        const li = document.createElement('li');
+        li.textContent = item;
+        refs.reasonList.appendChild(li);
+      });
+      refs.jsonOutput.textContent = JSON.stringify(plan, null, 2);
+    }
+
+    backendUrlInput.addEventListener('input', updateBackendStatus);
+    updateBackendStatus();
+
+    checkHealthBtn.addEventListener('click', async () => {
+      try {
+        const res = await fetch(`${getBackendBase()}/health`);
+        const data = await res.json();
+        alert(`後端正常：${JSON.stringify(data)}`);
+      } catch (err) {
+        alert(`後端連線失敗：${err}`);
+      }
+    });
+
+    checkBalancesBtn.addEventListener('click', async () => {
+      try {
+        const res = await fetch(`${getBackendBase()}/api/account/balances`);
+        const data = await res.json();
+        refs.jsonOutput.textContent = JSON.stringify(data, null, 2);
+        alert('已請求 /api/account/balances，結果顯示在 JSON 區。');
+      } catch (err) {
+        alert(`Bitget 餘額請求失敗：${err}`);
+      }
+    });
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const payload = {
+        symbol: document.getElementById('symbol').value.trim(),
+        timeframe: document.getElementById('timeframe').value,
+        marketData: document.getElementById('marketData').value.trim(),
+        riskPercent: document.getElementById('riskPercent').value,
+        minRR: document.getElementById('minRR').value
+      };
+
+      try {
+        const res = await fetch(`${getBackendBase()}/api/analyze`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const result = await res.json();
+        renderPlan(result);
+      } catch (err) {
+        renderPlan({
+          bias: 'no_trade',
+          entry: null,
+          stop_loss: null,
+          take_profit_1: null,
+          take_profit_2: null,
+          risk_reward: null,
+          confidence: 'low',
+          reason: [`後端連線失敗: ${String(err)}`],
+          invalidation: 'backend unreachable',
+          disclaimer: 'For educational use only. Not financial advice.'
+        });
+      }
+    });
+
+    renderPlan({
+      bias: 'long',
+      entry: '102350 - 102500',
+      stop_loss: '101800',
+      take_profit_1: '103200',
+      take_profit_2: '104000',
+      risk_reward: '1:2.1',
+      confidence: 'medium',
+      reason: ['這是初始畫面。按「送到後端分析」後會改成真實 API response。'],
+      invalidation: '15m close below 101800',
+      disclaimer: 'For educational use only. Not financial advice.',
+      meta: { engine: 'waiting-for-backend' }
+    });
+  </script>
+</body>
+</html>
