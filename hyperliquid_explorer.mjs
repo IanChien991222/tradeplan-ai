@@ -2,7 +2,6 @@
 // 從排行榜自動發現和評級高表現交易員
 
 import https from 'https';
-import { analyzeTraderPerformance } from './whale_tracker.mjs';
 
 const HYPERLIQUID_API = 'api.hyperliquid.xyz';
 
@@ -51,14 +50,17 @@ const TRADER_ARCHETYPES = {
 };
 
 // ===== API 函數 =====
-async function getLeaderboard() {
+async function callHyperliquidAPI(request) {
   return new Promise((resolve, reject) => {
+    const postData = JSON.stringify(request);
+    
     const options = {
       hostname: HYPERLIQUID_API,
       path: '/info',
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'Content-Length': Buffer.byteLength(postData)
       }
     };
 
@@ -67,59 +69,62 @@ async function getLeaderboard() {
       res.on('data', (chunk) => { data += chunk; });
       res.on('end', () => {
         try {
+          if (res.statusCode !== 200) {
+            reject(new Error(\`API returned status \${res.statusCode}: \${data}\`));
+            return;
+          }
           resolve(JSON.parse(data));
         } catch (e) {
-          reject(e);
+          reject(new Error(\`JSON parse error: \${e.message}, data: \${data.substring(0, 100)}\`));
         }
       });
     });
 
     req.on('error', reject);
-    req.write(JSON.stringify({
-      type: 'leaderboard'
-    }));
+    req.write(postData);
     req.end();
   });
 }
 
 async function getUserFills(address) {
-  return new Promise((resolve, reject) => {
-    const options = {
-      hostname: HYPERLIQUID_API,
-      path: '/info',
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      }
-    };
-
-    const req = https.request(options, (res) => {
-      let data = '';
-      res.on('data', (chunk) => { data += chunk; });
-      res.on('end', () => {
-        try {
-          resolve(JSON.parse(data));
-        } catch (e) {
-          reject(e);
-        }
-      });
-    });
-
-    req.on('error', reject);
-    req.write(JSON.stringify({
-      type: 'userFills',
-      user: address
-    }));
-    req.end();
+  return callHyperliquidAPI({
+    type: 'userFills',
+    user: address
   });
 }
 
-// ===== 分析函數 =====
-async function analyzeTraderDetail(address) {
+// ===== 簡化版探索 - 使用示例地址 =====
+export async function exploreTopTraders(limit = 10) {
   try {
+    console.log(\`[\${new Date().toISOString()}] 🔍 Hyperliquid Explorer 示例模式\`);
+    console.log('註: Hyperliquid 可能沒有公開的排行榜 API');
+    console.log('\\n💡 使用方式：');
+    console.log('1. 從 Hyperliquid 網站手動找到高績效地址');
+    console.log('2. 使用 analyzeTraderDetail() 分析該地址');
+    console.log('3. 根據分析結果決定是否加入 whale_tracker.mjs');
+    console.log('\\n示例分析地址（如果你有真實地址請替換）：');
+    
+    // 示例: 如果你有實際地址，可以這樣使用
+    // const exampleAddress = '0x1234...'; 
+    // const analysis = await analyzeTraderDetail(exampleAddress);
+    // console.log(analysis);
+    
+    return [];
+    
+  } catch (error) {
+    console.error('探索錯誤:', error.message);
+    return [];
+  }
+}
+
+// ===== 分析函數 =====
+export async function analyzeTraderDetail(address) {
+  try {
+    console.log(\`\\n正在分析地址: \${address}\`);
     const fills = await getUserFills(address);
     
     if (!fills || fills.length === 0) {
+      console.log('此地址沒有交易記錄');
       return null;
     }
 
@@ -144,7 +149,7 @@ async function analyzeTraderDetail(address) {
     let totalHoldingTime = 0;
     let closedPositions = 0;
     
-    for (const fill of recentFills.reverse()) {
+    for (const fill of [...recentFills].reverse()) {
       const key = fill.coin;
       
       if (fill.side === 'B') {
@@ -155,7 +160,7 @@ async function analyzeTraderDetail(address) {
       } else if (fill.side === 'A' && positions.has(key)) {
         const buys = positions.get(key);
         if (buys.length > 0) {
-          const holdingTime = (fill.time - buys[0].time) / (1000 * 60 * 60); // 小時
+          const holdingTime = (fill.time - buys[0].time) / (1000 * 60 * 60);
           totalHoldingTime += holdingTime;
           closedPositions++;
           buys.shift();
@@ -165,7 +170,7 @@ async function analyzeTraderDetail(address) {
     
     const avgHoldingPeriod = closedPositions > 0 ? totalHoldingTime / closedPositions : 0;
     
-    // 計算勝率（簡化版）
+    // 計算勝率
     let wins = 0;
     let losses = 0;
     const coinGroups = new Map();
@@ -197,7 +202,7 @@ async function analyzeTraderDetail(address) {
     
     const winRate = (wins + losses) > 0 ? wins / (wins + losses) : 0;
     
-    return {
+    const metrics = {
       address,
       tradesPerDay,
       avgPositionSize,
@@ -208,8 +213,22 @@ async function analyzeTraderDetail(address) {
       losses
     };
     
+    const classification = classifyTrader(metrics);
+    
+    console.log(\`\\n📊 分析結果:\`);
+    console.log(\`勝率: \${(winRate * 100).toFixed(1)}%\`);
+    console.log(\`日交易: \${tradesPerDay} 筆\`);
+    console.log(\`平均倉位: $\${avgPositionSize.toFixed(0)}\`);
+    console.log(\`平均持倉: \${avgHoldingPeriod.toFixed(1)} 小時\`);
+    console.log(\`類型: \${classification.type} (信心度: \${classification.confidence})\`);
+    
+    return {
+      metrics,
+      classification
+    };
+    
   } catch (error) {
-    console.error(`分析錯誤 (${address}):`, error.message);
+    console.error(\`分析錯誤 (\${address}): \${error.message}\`);
     return null;
   }
 }
@@ -224,7 +243,6 @@ function classifyTrader(metrics) {
     let score = 0;
     const criteria = archetype.criteria;
     
-    // 檢查勝率
     if (criteria.winRate) {
       if (metrics.winRate >= criteria.winRate.min && 
           (!criteria.winRate.max || metrics.winRate <= criteria.winRate.max)) {
@@ -232,7 +250,6 @@ function classifyTrader(metrics) {
       }
     }
     
-    // 檢查倉位大小
     if (criteria.avgPositionSize) {
       if (metrics.avgPositionSize >= (criteria.avgPositionSize.min || 0) &&
           (!criteria.avgPositionSize.max || metrics.avgPositionSize <= criteria.avgPositionSize.max)) {
@@ -240,7 +257,6 @@ function classifyTrader(metrics) {
       }
     }
     
-    // 檢查交易頻率
     if (criteria.tradingFrequency) {
       if (metrics.tradesPerDay >= (criteria.tradingFrequency.min || 0) &&
           metrics.tradesPerDay <= (criteria.tradingFrequency.max || 999)) {
@@ -248,7 +264,6 @@ function classifyTrader(metrics) {
       }
     }
     
-    // 檢查持倉時間
     if (criteria.holdingPeriod) {
       if (metrics.avgHoldingPeriod >= (criteria.holdingPeriod.min || 0) &&
           (!criteria.holdingPeriod.max || metrics.avgHoldingPeriod <= criteria.holdingPeriod.max)) {
@@ -259,7 +274,6 @@ function classifyTrader(metrics) {
     scores[type] = score;
   }
   
-  // 找出最高分的類型
   let bestType = null;
   let bestScore = 0;
   
@@ -270,7 +284,6 @@ function classifyTrader(metrics) {
     }
   }
   
-  // 如果分數太低（< 50），視為 'UNKNOWN'
   if (bestScore < 50) {
     return {
       type: 'UNKNOWN',
@@ -287,54 +300,6 @@ function classifyTrader(metrics) {
   };
 }
 
-// ===== 主探索函數 =====
-export async function exploreTopTraders(limit = 50) {
-  try {
-    console.log(`[${new Date().toISOString()}] 🔍 開始探索 Top ${limit} 交易員...`);
-    
-    const leaderboard = await getLeaderboard();
-    
-    if (!leaderboard || leaderboard.length === 0) {
-      console.log('無法獲取排行榜數據');
-      return [];
-    }
-    
-    const topTraders = leaderboard.slice(0, limit);
-    const results = [];
-    
-    for (let i = 0; i < topTraders.length; i++) {
-      const trader = topTraders[i];
-      console.log(`[${i + 1}/${topTraders.length}] 分析: ${trader.user || trader.address}`);
-      
-      const metrics = await analyzeTraderDetail(trader.user || trader.address);
-      
-      if (metrics) {
-        const classification = classifyTrader(metrics);
-        
-        results.push({
-          rank: i + 1,
-          address: trader.user || trader.address,
-          metrics,
-          classification,
-          leaderboardData: trader
-        });
-        
-        console.log(`  → 類型: ${classification.type}, 信心度: ${classification.confidence}`);
-        console.log(`  → 勝率: ${(metrics.winRate * 100).toFixed(1)}%, 日交易: ${metrics.tradesPerDay}`);
-      }
-      
-      // API 限速
-      await new Promise(resolve => setTimeout(resolve, 1000));
-    }
-    
-    return results;
-    
-  } catch (error) {
-    console.error('探索錯誤:', error.message);
-    return [];
-  }
-}
-
 // ===== 篩選高價值目標 =====
 export function filterHighValueTargets(traders, targetType = 'INSIDER') {
   return traders
@@ -348,27 +313,34 @@ export function generateTrackingRecommendations(traders) {
   const insiders = filterHighValueTargets(traders, 'INSIDER');
   const snipers = filterHighValueTargets(traders, 'SNIPER');
   
-  console.log('\n===== 追蹤建議 =====');
+  console.log('\\n===== 追蹤建議 =====');
   
-  console.log(`\n🎯 Insiders (${insiders.length})：`);
+  console.log(\`\\n🎯 Insiders (\${insiders.length})：\`);
   insiders.slice(0, 10).forEach((t, i) => {
-    console.log(`${i + 1}. ${t.address.substring(0, 10)}... - 勝率: ${(t.metrics.winRate * 100).toFixed(1)}%, 倉位: $${t.metrics.avgPositionSize.toFixed(0)}`);
+    console.log(\`\${i + 1}. \${t.address.substring(0, 10)}... - 勝率: \${(t.metrics.winRate * 100).toFixed(1)}%, 倉位: $\${t.metrics.avgPositionSize.toFixed(0)}\`);
   });
   
-  console.log(`\n🎯 Snipers (${snipers.length})：`);
+  console.log(\`\\n🎯 Snipers (\${snipers.length})：\`);
   snipers.slice(0, 10).forEach((t, i) => {
-    console.log(`${i + 1}. ${t.address.substring(0, 10)}... - 勝率: ${(t.metrics.winRate * 100).toFixed(1)}%, 日交易: ${t.metrics.tradesPerDay}`);
+    console.log(\`\${i + 1}. \${t.address.substring(0, 10)}... - 勝率: \${(t.metrics.winRate * 100).toFixed(1)}%, 日交易: \${t.metrics.tradesPerDay}\`);
   });
   
   return { insiders, snipers };
 }
 
 // ===== 命令行執行 =====
-if (import.meta.url === `file://${process.argv[1]}`) {
+if (import.meta.url === \`file://\${process.argv[1]}\`) {
   (async () => {
-    const traders = await exploreTopTraders(50);
-    generateTrackingRecommendations(traders);
+    await exploreTopTraders();
+    
+    console.log('\\n\\n💡 使用指南:');
+    console.log('='.repeat(50));
+    console.log('1. 訪問 https://app.hyperliquid.xyz/leaderboard');
+    console.log('2. 找到高勝率/高收益的地址');
+    console.log('3. 使用以下命令分析:');
+    console.log('   node -e "import(\\'./hyperliquid_explorer.mjs\\').then(m => m.analyzeTraderDetail(\\'0x地址\\'))"');
+    console.log('4. 如果分析結果良好，加入 whale_tracker.mjs 追蹤');
   })();
 }
 
-export { analyzeTraderDetail, classifyTrader, TRADER_ARCHETYPES };
+export { classifyTrader, TRADER_ARCHETYPES };
